@@ -113,10 +113,12 @@
             const viewResponse = await fetch('/view');
             if (viewResponse.ok) {
               const viewData = await viewResponse.json();
-              statusDiv.textContent = 'Status:\n' + JSON.stringify(viewData, null, 2);
+              statusDiv.textContent =
+                'Status:\n' + JSON.stringify(viewData, null, 2);
             }
           } catch (e) {
-            statusDiv.textContent = 'Status: ' + data + ' (endpoint /view no implementado)';
+            statusDiv.textContent =
+              'Status: ' + data + ' (endpoint /view no implementado)';
           }
         } catch (error) {
           resultDiv.textContent = 'Error: ' + error.message;

@@ -24,10 +24,21 @@ app.post('/play', (req: Request, res: Response) => {
       error: 'Debe enviar piedra, papel o tijera',
     });
   }
-
-  const result = play(choice);
-
-  res.json(result);
+  try {
+    play(choice);
+    res.sendStatus(200);
+  } catch (error) {
+    // 'error' is of type unknown here
+    if (error instanceof Error) {
+      // Inside this block, 'error' is narrowed to type 'Error'
+      console.error('Caught an Error instance:', error.message);
+      res.json(error.message);
+    } else {
+      // Handle cases where something other than an Error object was thrown
+      console.error('An unknown error occurred:', error);
+      res.json(error);
+    }
+  }
 });
 
 app.listen(3000, () => {
@@ -37,3 +48,12 @@ app.listen(3000, () => {
 app.get('/view', (req: Request, res: Response) => {
   res.json(partida);
 });
+
+app.post('/nueva-partida', (req: Request, res: Response) => {
+  throw new Error('No implementado');
+});
+
+/*
+TODO:
+- 
+*/

@@ -20,14 +20,22 @@ function getComputerChoice(): Choice {
 
 export type PartidaResult = 'Ganaste' | 'Perdiste' | 'Juego en curso';
 
-export function play(humanChoice: Choice): PartidaResult {
+export function play(humanChoice: Choice): void {
+  // Validamos que todavía no se haya terminado la partid
+  if (partida.filter((ronda) => ronda.result == 'ganaste').length === 3) {
+    throw new Error('Ya ganaste');
+  }
+
+  if (partida.filter((ronda) => ronda.result == 'perdiste').length === 3) {
+    throw new Error('A llorar a la iglesia');
+  }
+
   // Jugamos la ronda, la guardamos con nombre `i`
   let i = playRound(humanChoice);
   //aca se guarda el resultado de la partida en el array de partidas
   partida.push(i);
   // chequeamos el estado actual de la partida completa. Ganaste, perdiste, o sigue el juego
-  const xxx = endGame(partida);
-  return xxx;
+  // endGame(partida);
 }
 
 export function playRound(humanChoice: Choice): RoundResult {
@@ -49,22 +57,12 @@ export function playRound(humanChoice: Choice): RoundResult {
   return ronda;
 }
 
-function endGame(rondas: RoundResult[]): PartidaResult {
+/*function endGame(rondas: RoundResult[]): void {
   if (rondas.filter((ronda) => ronda.result == 'ganaste').length === 3) {
     rondas.length = 0;
-
-    return 'Ganaste';
   }
 
   if (rondas.filter((ronda) => ronda.result == 'perdiste').length === 3) {
     rondas.length = 0;
-    return 'Perdiste';
   }
-  // red de seguridad
-  return 'Juego en curso';
-}
-
-// Command -> cosas que tienen efecto y hacen modificaciones
-// Query -> cosas de lectura que no tienen efecto
-// R
-// Segregation
+}*/
