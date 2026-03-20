@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Piedra, Papel o Tijera</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        text-align: center;
+        padding: 2rem;
+        background: #f5f5f5;
+      }
+      h1 {
+        color: #333;
+      }
+      .options {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin: 2rem 0;
+      }
+      button {
+        font-size: 3rem;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.1s;
+      }
+      button:hover {
+        transform: scale(1.1);
+      }
+      button:active {
+        transform: scale(0.95);
+      }
+      #result {
+        font-size: 1.5rem;
+        margin: 1rem 0;
+        padding: 1rem;
+        border-radius: 8px;
+      }
+      #status {
+        font-size: 1.2rem;
+        color: #666;
+        margin-top: 2rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 8px;
+        text-align: left;
+        white-space: pre-wrap;
+      }
+      #history {
+        font-size: 1rem;
+        color: #666;
+        margin-top: 1rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 8px;
+        text-align: left;
+        max-height: 200px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Piedra, Papel o Tijera</h1>
+
+    <div class="options">
+      <button onclick="play('piedra')">🪨</button>
+      <button onclick="play('papel')">📄</button>
+      <button onclick="play('tijera')">✂️</button>
+    </div>
+
+    <div id="result"></div>
+    <div id="status"></div>
+    <div id="history"></div>
+
+    <script>
+      const history = [];
+
+      async function play(choice) {
+        const resultDiv = document.getElementById('result');
+        const statusDiv = document.getElementById('status');
+        const historyDiv = document.getElementById('history');
+
+        try {
+          const response = await fetch('/play', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ choice }),
+          });
+
+          const data = await response.text();
+
+          resultDiv.textContent = data;
+          resultDiv.style.background =
+            data === 'Ganaste'
+              ? '#d4edda'
+              : data === 'Perdiste'
+                ? '#f8d7da'
+                : '#fff3cd';
+
+          // Store in history
+          history.push(data);
+          historyDiv.textContent = 'History:\n' + history.join('\n');
+
+          // Try to refresh status from /view (may not exist yet)
+          try {
+            const viewResponse = await fetch('/view');
+            if (viewResponse.ok) {
+              const viewData = await viewResponse.json();
+              statusDiv.textContent = 'Status:\n' + JSON.stringify(viewData, null, 2);
+            }
+          } catch (e) {
+            statusDiv.textContent = 'Status: ' + data + ' (endpoint /view no implementado)';
+          }
+        } catch (error) {
+          resultDiv.textContent = 'Error: ' + error.message;
+          resultDiv.style.background = '#f8d7da';
+        }
+      }
+    </script>
+  </body>
+</html>
